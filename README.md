@@ -44,6 +44,7 @@ pip install -r requirements.txt
 
 ```env
 DISCORD_TOKEN="your_token_here"
+
 DISCORD_GUILD_ID="your_main_server_id_here"
 ```
 
