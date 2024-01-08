@@ -54,7 +54,7 @@ DISCORD_GUILD_ID="your_main_server_id_here"
 python main.py
 ```
 
-## Community (Contributing, Support, etc.)
+## Community
 
 ### Contributing
 
