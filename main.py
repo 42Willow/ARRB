@@ -3,6 +3,7 @@ import discord
 from discord import app_commands
 from dotenv import load_dotenv, find_dotenv
 import os
+import json
 
 load_dotenv()  # Load variables from .env file
 # Your secret Discord token, don't share this with anyone!
@@ -20,11 +21,19 @@ class MyClient(discord.Client):
         await self.tree.sync(guild=GUILD_ID)
 
 intents = discord.Intents.default()
+intents.message_content = True
 client = MyClient(intents=intents)
 
 @client.event
 async def on_ready():
-    print(f"Logged in as {client.user.name}")
+    print(f'Logged in as {client.user} (ID: {client.user.id})')
+    print('------')
+
+# @client.event
+# async def on_message(message):
+#     # we do not want the bot to reply to itself
+#     if message.author.id == client.user.id:
+#         return
 
 @client.tree.command()
 async def ping(interaction:discord.Interaction):
@@ -67,6 +76,21 @@ async def purge(interaction: discord.Interaction, amount: int):
     """Purge messages"""
     await interaction.response.send_message(f"Purged {amount} messages", ephemeral=True)
     await interaction.channel.purge(limit=amount)
+
+@client.tree.command()
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.checks.has_permissions(manage_guild=True)
+async def settings(interaction: discord.Interaction):
+    """Setup ARRB settings :)"""
+    pages = app_commands.Paginator()
+
+# async def audit_log(embed, view: Optional[discord.View], guild):
+#     # Get the log channel from data/settings.json
+#     with open('data/settings.json') as f:
+#         settings = json.load(f)
+#         print(settings)
+#     log_channel = guild.get_channel(1117569068220825741)
+#     await log_channel.send(embed=embed, view=view)
 
 # @client.tree.command()
 # @app_commands.describe(member="Who's social status do I check?")
