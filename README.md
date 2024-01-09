@@ -5,7 +5,7 @@
   <b> ~ ARRB ~ </b>
 </p>
 
-Automated Rice Ranker Bot: A social credit and general purpose Discord bot which focuses on simplicity.
+Automated Rice Ranking Bot: A social credit and general purpose Discord bot which focuses on simplicity.
 
 ## Background
 
