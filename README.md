@@ -60,6 +60,17 @@ DISCORD_GUILD_ID="your_main_server_id_here"
 python main.py
 ```
 
+### Usage
+
+#### Permissions
+
+Unless changed manually, the following commands are only available to these specified permissions:
+
+- `/settings`: `manage_guild`
+- `/purge`: `manage_messages`
+- `/mute`: `manage_roles`
+- `/unmute`: `manage_roles`
+
 ## Community
 
 ### Contributing
