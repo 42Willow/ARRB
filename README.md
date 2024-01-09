@@ -1,4 +1,9 @@
-# ARRB
+<p align="center">
+  <img width="25%" src="https://github.com/42Willow/ARRB/blob/main/assets/ARRB-round.png?raw=true" />
+</p>
+<p align="center">
+  <b> ~ ARRB ~ </b>
+</p>
 
 Automated Rice Ranker Bot: A social credit and general purpose Discord bot which focuses on simplicity.
 
