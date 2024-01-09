@@ -71,6 +71,10 @@ Unless changed manually, the following commands are only available to these spec
 - `/mute`: `manage_roles`
 - `/unmute`: `manage_roles`
 
+#### Ranking
+
+ARRB uses a ranking system based on rice. The more rice you have, the higher your rank. Rice is earned by being active in the server (sending messages, etc.). Unlike some other bots, ARRB does not level up linearly. Instead, the amount of rice required to level up increases exponentially - and even that formula is configurable!
+
 ## Community
 
 ### Contributing
