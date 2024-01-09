@@ -15,6 +15,7 @@ ARRB was created as a way to have fun whilst refining my Python skills and revis
 
 - [x] Slash commands
 - [x] **Moderation:** Reporting
+- [x] **Moderation:** Purging messages
 - [ ] **Moderation:** Muting
 - [ ] Per-guild configuration
 - [ ] Per-guild data storage (e.g. user xp)

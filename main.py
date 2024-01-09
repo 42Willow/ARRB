@@ -60,6 +60,14 @@ async def report_message(interaction: discord.Interaction, message: discord.Mess
     view = ReportView(message)
     await log_channel.send(embed=embed, view=view)
 
+@client.tree.command()
+@app_commands.default_permissions(manage_messages=True)
+@app_commands.checks.has_permissions(manage_messages=True)
+async def purge(interaction: discord.Interaction, amount: int):
+    """Purge messages"""
+    await interaction.response.send_message(f"Purged {amount} messages", ephemeral=True)
+    await interaction.channel.purge(limit=amount)
+
 # @client.tree.command()
 # @app_commands.describe(member="Who's social status do I check?")
 # async def profile(interaction: discord.Interaction, member: Optional[discord.Member] = None):
