@@ -1,9 +1,11 @@
 from typing import Optional
 import discord
 from discord import app_commands
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 import os
 import json
+from discord.ext import tasks
+import aiohttp
 
 load_dotenv()  # Load variables from .env file
 # Your secret Discord token, don't share this with anyone!
@@ -11,35 +13,87 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 # Your guild where you want to sync commands on each startup
 GUILD_ID = discord.Object(id=int(os.getenv('DISCORD_GUILD_ID')))
 
+##### AUTO SYNC #####
+auto_update = os.getenv('GH_AUTO_UPDATE')
+repo_owner = os.getenv('GH_REPO_OWNER')
+repo_name = os.getenv('GH_REPO_NAME')
+branch_name = os.getenv('GH_BRANCH_NAME')
+
+# GitHub API endpoint for obtaining the latest commit hash
+api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/branches/{branch_name}"
+
+# # Function to check for updates
+async def check_for_updates():
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url) as response:
+                response.raise_for_status()
+                latest_commit_hash = (await response.json())["commit"]["sha"]
+                return latest_commit_hash
+    except Exception as e:
+        print(f"API URL: {api_url}")
+        print(f"Error checking for updates: {e}")
+        return None
+
+##### BOT #####
 class MyClient(discord.Client):
     def __init__(self, *, intents: discord.Intents):
         super().__init__(intents=intents)
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self):
+        await self.tree.sync()
         self.tree.copy_global_to(guild=GUILD_ID)
-        await self.tree.sync(guild=GUILD_ID)
+        self.auto_update.start()
+
+    async def on_ready(self):
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('------')
+
+    @tasks.loop(seconds=20)  # task runs every 20 seconds
+    async def auto_update(self):
+        print('Updating!...')
+        channel = self.get_channel(1166266501133762580)  # channel ID goes here
+        try:
+            latest_commit_hash = await check_for_updates()
+        except Exception as e:
+            print(f"Error checking for updates: {e}")
+            await channel.send(f"Error checking for updates: {e}")
+            return
+
+        if latest_commit_hash:
+            try:
+                with open("data/last_commit", "r") as file:
+                    last_commit_hash = file.read()
+            except FileNotFoundError:
+                print("File not found. Creating file...")
+                with open("data/last_commit", "w") as file:
+                    file.write(latest_commit_hash)
+                return
+
+            if latest_commit_hash != last_commit_hash:
+                print("Update found. Shutting down main.py...")
+                await channel.send(f"Update found. Shutting down main.py...")
+                with open("data/last_commit", "w") as file:
+                    file.write(latest_commit_hash)          
+                await client.close()
+            else:
+                print("No update found.")
+                await channel.send(f"No update found.")
+
+    @auto_update.before_loop
+    async def before_my_task(self):
+        await self.wait_until_ready()  # wait until the bot logs in
 
 intents = discord.Intents.default()
 intents.message_content = True
 client = MyClient(intents=intents)
 
-@client.event
-async def on_ready():
-    print(f'Logged in as {client.user} (ID: {client.user.id})')
-    print('------')
-
-# @client.event
-# async def on_message(message):
-#     # we do not want the bot to reply to itself
-#     if message.author.id == client.user.id:
-#         return
-
 @client.tree.command()
 async def ping(interaction:discord.Interaction):
     """Ping ARRB :3"""
     emoji = client.get_emoji(1166270365627056138)
-    await interaction.response.send_message(f'Pong! {emoji}')
+    await interaction.response.send_message(f"Pong! {emoji}\nLatency: {round(client.latency * 1000)}ms", ephemeral=True)
 
 class ReportView(discord.ui.View):
     def __init__(self, message: discord.Message):
