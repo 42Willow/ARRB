@@ -35,6 +35,36 @@ async def check_for_updates():
         print(f"Error checking for updates: {e}")
         return None
 
+async def gitupdate():
+    print('Updating!...')
+    channel = client.get_channel(1166266501133762580)  # channel ID goes here
+    try:
+        latest_commit_hash = await check_for_updates()
+    except Exception as e:
+        print(f"Error checking for updates: {e}")
+        await channel.send(f"Error checking for updates: {e}")
+        return
+
+    if latest_commit_hash:
+        try:
+            with open("data/last_commit", "r") as file:
+                last_commit_hash = file.read()
+        except FileNotFoundError:
+            print("File not found. Creating file...")
+            with open("data/last_commit", "w") as file:
+                file.write(latest_commit_hash)
+            return
+
+        if latest_commit_hash != last_commit_hash:
+            print("Update found. Shutting down main.py...")
+            await channel.send(f"Update found. Shutting down main.py...")
+            with open("data/last_commit", "w") as file:
+                file.write(latest_commit_hash)          
+            await client.close()
+        else:
+            print("No update found.")
+            await channel.send(f"No update found.")
+
 ##### BOT #####
 class MyClient(discord.Client):
     def __init__(self, *, intents: discord.Intents):
@@ -52,34 +82,8 @@ class MyClient(discord.Client):
 
     @tasks.loop(seconds=20)  # task runs every 20 seconds
     async def auto_update(self):
-        print('Updating!...')
-        channel = self.get_channel(1166266501133762580)  # channel ID goes here
-        try:
-            latest_commit_hash = await check_for_updates()
-        except Exception as e:
-            print(f"Error checking for updates: {e}")
-            await channel.send(f"Error checking for updates: {e}")
-            return
-
-        if latest_commit_hash:
-            try:
-                with open("data/last_commit", "r") as file:
-                    last_commit_hash = file.read()
-            except FileNotFoundError:
-                print("File not found. Creating file...")
-                with open("data/last_commit", "w") as file:
-                    file.write(latest_commit_hash)
-                return
-
-            if latest_commit_hash != last_commit_hash:
-                print("Update found. Shutting down main.py...")
-                await channel.send(f"Update found. Shutting down main.py...")
-                with open("data/last_commit", "w") as file:
-                    file.write(latest_commit_hash)          
-                await client.close()
-            else:
-                print("No update found.")
-                await channel.send(f"No update found.")
+        await gitupdate()
+        
 
     @auto_update.before_loop
     async def before_my_task(self):
