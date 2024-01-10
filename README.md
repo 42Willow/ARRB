@@ -1,3 +1,9 @@
+# IMPORTANT
+
+ARRB is currently in development and is not ready for use. Please do not use it in production.
+
+----------------
+
 <p align="center">
   <img width="25%" src="https://github.com/42Willow/ARRB/blob/main/assets/ARRB-round.png?raw=true" />
 </p>
@@ -49,8 +55,10 @@ pip install -r requirements.txt
 4. Create a `.env` file in the root directory and add the following:
 
 ```env
+# You can get this from https://discord.com/developers/applications
 DISCORD_TOKEN="your_token_here"
 
+# This is the ID of the guild that the bot will sync to immediately, other guilds will take up to 1 hour to sync.
 DISCORD_GUILD_ID="your_main_server_id_here"
 ```
 
